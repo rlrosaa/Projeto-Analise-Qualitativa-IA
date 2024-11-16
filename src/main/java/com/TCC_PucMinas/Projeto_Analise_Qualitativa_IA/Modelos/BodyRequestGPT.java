@@ -60,14 +60,17 @@ public class BodyRequestGPT {
         this.messages[0] = new Message();
         this.messages[0].role = Enumeradores.RolesGPT.SYSTEM.getValorRole();
         this.messages[0].content = new Content[1];
+        this.messages[0].content[0] = new Content();
         this.messages[0].content[0].type = "text";
         this.messages[0].content[0].text = PromptsIA.PROMPT_AVALIACAO_RESPOSTA;
 
         this.messages[1] = new Message();
         this.messages[1].role = Enumeradores.RolesGPT.USER.getValorRole();
         this.messages[1].content = new Content[2];
+        this.messages[1].content[0] = new Content();
         this.messages[1].content[0].type = "text";
         this.messages[1].content[0].text = dadosAvaliacaoImagem.criaStringPerguntaEResposta();
+        this.messages[1].content[1] = new Content();
         this.messages[1].content[1].type = "image_url";
         this.messages[1].content[1].text = dadosAvaliacaoImagem.getUrlImagem();
     }
