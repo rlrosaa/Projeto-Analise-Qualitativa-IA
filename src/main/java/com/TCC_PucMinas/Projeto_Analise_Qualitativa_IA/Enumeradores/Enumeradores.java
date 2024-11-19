@@ -30,4 +30,27 @@ public class Enumeradores {
         }
     }
 
+    @Getter
+    public enum ModeloClaude {
+        CLAUDE_3_5("claude-3-5-sonnet-20241022");
+
+        private final String nomeModelo;
+
+        ModeloClaude(String nomeModelo) {
+            this.nomeModelo = nomeModelo;
+        }
+    }
+
+    @Getter
+    public enum RolesClaude {
+        USER("user"),
+        ASSISTANT("assistant");
+
+        private final String valorRole;
+
+        RolesClaude(String nomeModelo) {
+            this.valorRole = nomeModelo;
+        }
+    }
+
 }

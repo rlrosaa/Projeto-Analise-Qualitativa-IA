@@ -29,12 +29,14 @@ class ProcessamentoDadosServicoTest {
     @Test
     void gerarAvaliacaoQualitativaDadosImagem_deveChamarConexaoAPIRepositorio() {
 
-        String mockStringBodyRequest= "{\"model\":\"gpt-4\",\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"\",\"image_url\":null}]},{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Pergunta do Usuario: O que há na imagem?\\nResposta gerada pelo App: Passaros\",\"image_url\":null},{\"type\":\"image_url\",\"text\":\"url/test\",\"image_url\":null}]}],\"temperature\":1.0,\"max_tokens\":300,\"top_p\":1.0,\"frequency_penalty\":0.0,\"presence_penalty\":0.0}";
+        String mockStringBodyRequestGPT= "{\"model\":\"gpt-4\",\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"\"}]},{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Pergunta do Usuario: O que há na imagem?\\nResposta gerada pelo App: Passaros\"},{\"type\":\"image_url\",\"image_url\":\"url/test\"}]}],\"temperature\":1.0,\"max_tokens\":300,\"top_p\":1.0,\"frequency_penalty\":0.0,\"presence_penalty\":0.0}";
+        String mockStringBodyRequestClaude= "{\"model\":\"claude-3-5-sonnet-20241022\",\"max_tokens\":300,\"system\":\"\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Pergunta do Usuario: O que há na imagem?\\nResposta gerada pelo App: Passaros\"},{\"type\":\"image\",\"source\":{\"type\":\"base64\",\"media_type\":\"image/jpeg\",\"data\":\"imagemEmBase64\"}}]}]}";
 
         DadosAvaliacaoImagem dadosAvaliacaoImagem =
                 new DadosAvaliacaoImagem(
                         "O que há na imagem?",
                         "url/test",
+                        "imagemEmBase64",
                         "Passaros"
                 );
 
@@ -42,6 +44,8 @@ class ProcessamentoDadosServicoTest {
 
         try {
             when(conexaoAPIRepositorio.postRequestApiGPT4(anyString()))
+                    .thenReturn(mockResponse);
+            when(conexaoAPIRepositorio.postRequestApiClaude(anyString()))
                     .thenReturn(mockResponse);
         } catch (Exception e) {
             fail("Exception inesperada: " + e.getMessage());
@@ -53,7 +57,9 @@ class ProcessamentoDadosServicoTest {
         assertNotNull(resultado, "O resultado não deve ser nulo");
         try {
             verify(conexaoAPIRepositorio, times(1))
-                    .postRequestApiGPT4(mockStringBodyRequest);
+                    .postRequestApiGPT4(mockStringBodyRequestGPT);
+            verify(conexaoAPIRepositorio, times(1))
+                    .postRequestApiClaude(mockStringBodyRequestClaude);
         } catch (Exception e) {
             fail("Exception inesperada ao verificar o repositório: " + e.getMessage());
         }

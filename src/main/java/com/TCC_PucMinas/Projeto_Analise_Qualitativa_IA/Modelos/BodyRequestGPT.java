@@ -72,6 +72,6 @@ public class BodyRequestGPT {
         this.messages[1].content[0].text = dadosAvaliacaoImagem.criaStringPerguntaEResposta();
         this.messages[1].content[1] = new Content();
         this.messages[1].content[1].type = "image_url";
-        this.messages[1].content[1].text = dadosAvaliacaoImagem.getUrlImagem();
+        this.messages[1].content[1].imageUrl = dadosAvaliacaoImagem.getUrlImagem();
     }
 }

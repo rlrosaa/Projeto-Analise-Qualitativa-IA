@@ -13,9 +13,20 @@ public class ConexaoAPIRepositorioTests {
     private ConexaoAPIRepositorio conexaoAPIRepositorio;
 
     @Test
-    void testPostRequestApiGPT4() {
+    void testPostRequestApiGPT() {
         try{
             String resposta = conexaoAPIRepositorio.postRequestApiGPT4("");
+            System.out.println(resposta);
+        }
+        catch(Exception e){
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    void testPostRequestApiClaude() {
+        try{
+            String resposta = conexaoAPIRepositorio.postRequestApiClaude("");
             System.out.println(resposta);
         }
         catch(Exception e){

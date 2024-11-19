@@ -15,11 +15,7 @@ public class ConexaoAPIRepositorio {
         this.restTemplate = restTemplate;
     }
 
-    private String postRequestApi (String url, String bodyRequest, String tokenApi){
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + tokenApi);
+    private String postRequestApi (String url, String bodyRequest, HttpHeaders headers){
 
         HttpEntity<String> entity = new HttpEntity<>(bodyRequest, headers);
 
@@ -30,10 +26,34 @@ public class ConexaoAPIRepositorio {
     }
 
     public  String postRequestApiGPT4(String bodyRequest){
-        var url = Constantes.urlBaseApiGPT;
-        var tokenApiGPT4 = Constantes.tokenGPT;
+        var url = Constantes.URL_BASE_API_GPT;
+        var tokenApiGPT = Constantes.TOKEN_GPT;
 
-        return postRequestApi(url, bodyRequest, tokenApiGPT4);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenApiGPT);
+
+        return postRequestApi(url, bodyRequest, headers);
+
+    }
+
+    public  String postRequestApiGemini(String bodyRequest){
+        var url = Constantes.URL_BASE_API_GEMINI + "?key=" + Constantes.TOKEN_GEMINI;
+
+        return postRequestApi(url, bodyRequest, null);
+
+    }
+
+    public String postRequestApiClaude (String bodyRequest){
+        var url = Constantes.URL_BASE_API_CLAUDE;
+        var tokenClaude = Constantes.TOKEN_CLAUDE;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("x-api-key", tokenClaude);
+        headers.set("anthropic-version", Constantes.API_VERSION_CLAUDE);
+
+        return postRequestApi(url, bodyRequest, headers);
 
     }
 }

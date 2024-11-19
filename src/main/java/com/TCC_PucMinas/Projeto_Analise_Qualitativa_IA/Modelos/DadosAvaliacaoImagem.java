@@ -11,13 +11,16 @@ public class DadosAvaliacaoImagem {
 
     private String urlImagem;
 
+    private String dadosImagem;
+
     private String respostaApp;
 
     public DadosAvaliacaoImagem(
-            String perguntaUsuario, String urlImagem, String respostaApp) {
+            String perguntaUsuario, String urlImagem,String dadosImagem, String respostaApp) {
         this.perguntaUsuario = perguntaUsuario;
         this.urlImagem = urlImagem;
         this.respostaApp = respostaApp;
+        this.dadosImagem = dadosImagem;
     }
 
     public String criaStringPerguntaEResposta() {
