@@ -1,9 +1,7 @@
 package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Servico;
 
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Enumeradores.Enumeradores;
-import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.BodyRequestClaude;
-import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.BodyRequestGPT;
-import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.DadosAvaliacaoImagem;
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.*;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Repositorio.ConexaoAPIRepositorio;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,23 +23,73 @@ public class ProcessamentoDadosServico {
 
     public String gerarAvaliacaoQualitativaDadosImagem(DadosAvaliacaoImagem dadosAvaliacaoImagem){
 
-        String resultadoAvaliacaoGPT = null;
-        String resultadoAvaliacaoClaude = null;
+        String resultadoAvaliacaoGPT ;
+        String resultadoAvaliacaoClaude;
+        String resultadoAvaliacaoLlama;
+        String resultadoAvaliacaoConsolidado = null;
 
         try{
             String stringBodyRequestGPT = geraBodyRequestGPT(dadosAvaliacaoImagem);
             resultadoAvaliacaoGPT=
-                    conexaoAPIRepositorio.postRequestApiGPT4(stringBodyRequestGPT);
+                    conexaoAPIRepositorio.postRequestApiGPT(stringBodyRequestGPT);
 
             String stringBodyRequestClaude = gerarBodyRequestClaude(dadosAvaliacaoImagem);
             resultadoAvaliacaoClaude =
                     conexaoAPIRepositorio.postRequestApiClaude(stringBodyRequestClaude);
+
+            String stringBodyRequestLlama = gerarBodyRequestLlama(dadosAvaliacaoImagem);
+            resultadoAvaliacaoLlama =
+                    conexaoAPIRepositorio.postRequestApiLlama(stringBodyRequestLlama);
+
+            String stringBodyRequestCohere = gerarBodyRequestCohere(
+                    resultadoAvaliacaoGPT, resultadoAvaliacaoClaude, resultadoAvaliacaoLlama);
+            resultadoAvaliacaoConsolidado =
+                    conexaoAPIRepositorio.postRequestApiCohere(stringBodyRequestCohere);
         }
         catch(Exception e){
             e.printStackTrace();
         }
 
-        return resultadoAvaliacaoGPT;
+        return resultadoAvaliacaoConsolidado;
+    }
+
+    private String gerarBodyRequestCohere(
+            String resultadoAvaliacaoGPT,
+            String resultadoAvaliacaoClaude,
+            String resultadoAvaliacaoLlama) {
+
+        String stringBodyRequestCohere = null;
+
+        try{
+            BodyRequestCohere bodyRequestCohere = new BodyRequestCohere(
+                    resultadoAvaliacaoGPT,resultadoAvaliacaoClaude,resultadoAvaliacaoLlama,
+                    Enumeradores.ModeloCohere.COHERE_CHAT_V2);
+
+            stringBodyRequestCohere = objectMapper.writeValueAsString(bodyRequestCohere);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return stringBodyRequestCohere;
+    }
+
+    private String gerarBodyRequestLlama(DadosAvaliacaoImagem dadosAvaliacaoImagem) {
+
+        String stringBodyRequestLlama = null;
+
+        try{
+            BodyRequestLlama bodyRequestLlama = new BodyRequestLlama(
+                    dadosAvaliacaoImagem,Enumeradores.ModeloLlama.LLAMA_3_2_11B_VISION);
+
+            stringBodyRequestLlama = objectMapper.writeValueAsString(bodyRequestLlama);
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return stringBodyRequestLlama;
+
     }
 
     private String gerarBodyRequestClaude(DadosAvaliacaoImagem dadosAvaliacaoImagem) {

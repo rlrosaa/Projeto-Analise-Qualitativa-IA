@@ -25,13 +25,12 @@ public class ConexaoAPIRepositorio {
         return response.getBody();
     }
 
-    public  String postRequestApiGPT4(String bodyRequest){
+    public  String postRequestApiGPT(String bodyRequest){
         var url = Constantes.URL_BASE_API_GPT;
-        var tokenApiGPT = Constantes.TOKEN_GPT;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + tokenApiGPT);
+        headers.set("Authorization", "Bearer " + Constantes.TOKEN_GPT);
 
         return postRequestApi(url, bodyRequest, headers);
 
@@ -46,14 +45,35 @@ public class ConexaoAPIRepositorio {
 
     public String postRequestApiClaude (String bodyRequest){
         var url = Constantes.URL_BASE_API_CLAUDE;
-        var tokenClaude = Constantes.TOKEN_CLAUDE;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("x-api-key", tokenClaude);
+        headers.set("x-api-key", Constantes.TOKEN_CLAUDE);
         headers.set("anthropic-version", Constantes.API_VERSION_CLAUDE);
 
         return postRequestApi(url, bodyRequest, headers);
 
+    }
+
+    public String postRequestApiLlama (String bodyRequest){
+
+        var url = Constantes.URL_BASE_API_LLAMA;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + Constantes.TOKEN_LLAMA);
+
+        return postRequestApi(url, bodyRequest, headers);
+    }
+
+    public String postRequestApiCohere (String bodyRequest){
+
+        var url = Constantes.URL_BASE_API_COHERE;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + Constantes.TOKEN_COHERE);
+
+        return postRequestApi(url, bodyRequest, headers);
     }
 }

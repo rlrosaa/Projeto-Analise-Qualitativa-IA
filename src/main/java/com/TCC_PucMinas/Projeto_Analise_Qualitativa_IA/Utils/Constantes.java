@@ -12,6 +12,12 @@ public class Constantes {
     public static final String TOKEN_CLAUDE = "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";
     public static final String API_VERSION_CLAUDE = "2023-06-01";
 
+    public static final String URL_BASE_API_LLAMA = "https://api.llama-api.com/chat/completions";
+    public static final String TOKEN_LLAMA = "LA-603f6e8fe87447118b2a24531c28e0c4a5a6cd35239e46b2847adee6c77257aa";
+
+    public static final String URL_BASE_API_COHERE = "https://api.cohere.com/v2/chat";
+    public static final String TOKEN_COHERE = "l3IyZVzL041c416hsx1Ze58xkXra8jGaCqUEFhp0";
+
     public static final String MEDIA_TYPE_IMAGEM = "image/jpeg";
 
 

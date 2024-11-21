@@ -28,17 +28,17 @@ public class BodyRequestClaude {
         private Content[] content;
 
         private Message (DadosAvaliacaoImagem dadosAvaliacaoImagem){
-            this.role = Enumeradores.RolesClaude.USER.getValorRole();
+            this.role = Enumeradores.Role.USER.getValorRole();
             this.content = new Content[2];
 
             this.content[0] = new Content();
-            this.content[0].type = "text";
+            this.content[0].type = Enumeradores.DataType.TEXT.getDataType();
             this.content[0].text = dadosAvaliacaoImagem.criaStringPerguntaEResposta();
 
             this.content[1] = new Content();
-            this.content[1].type = "image";
+            this.content[1].type = Enumeradores.DataType.IMAGE.getDataType();
             this.content[1].source = new Source();
-            this.content[1].source.type = "base64";
+            this.content[1].source.type = Enumeradores.DataType.BASE64.getDataType();
             this.content[1].source.mediaType = Constantes.MEDIA_TYPE_IMAGEM;
             this.content[1].source.data = dadosAvaliacaoImagem.getDadosImagem();
         }
