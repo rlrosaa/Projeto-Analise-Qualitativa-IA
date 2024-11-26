@@ -8,12 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProcessamentoDadosServico {
+public class ProcessamentoDadosImagemServico {
 
     private final ObjectMapper objectMapper;
     private final ConexaoAPIRepositorio conexaoAPIRepositorio;
 
-    public ProcessamentoDadosServico (ConexaoAPIRepositorio conexaoAPIRepositorio){
+    public ProcessamentoDadosImagemServico(ConexaoAPIRepositorio conexaoAPIRepositorio){
 
         objectMapper = new ObjectMapper();
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);

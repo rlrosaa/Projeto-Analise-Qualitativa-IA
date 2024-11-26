@@ -20,5 +20,10 @@ public class Constantes {
 
     public static final String MEDIA_TYPE_IMAGEM = "image/jpeg";
 
+    public static final String DIRETORIO_BASE_DADOS = "base_dados";
+    public static final String DIRETORIO_IMAGENS = "imagens";
+    public static final String NOME_ARQUIVO_PLANILHA = "BaseDeDados.xlsx";
+    public static final String NOME_ABA_PLANILHA = "Base de Dados";
+
 
 }

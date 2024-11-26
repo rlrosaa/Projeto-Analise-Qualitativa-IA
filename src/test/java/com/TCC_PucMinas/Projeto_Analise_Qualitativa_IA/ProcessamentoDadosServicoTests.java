@@ -1,23 +1,22 @@
 package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA;
-
+import org.mockito.*;
+import org.springframework.web.client.RestTemplate;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.DadosAvaliacaoImagem;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Repositorio.ConexaoAPIRepositorio;
-import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Servico.ProcessamentoDadosServico;
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Servico.ProcessamentoDadosImagemServico;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProcessamentoDadosServicoTest {
 
-    @Mock
-    private ConexaoAPIRepositorio conexaoAPIRepositorio;
+    @Spy
+    private ConexaoAPIRepositorio conexaoAPIRepositorio = spy(new ConexaoAPIRepositorio(new RestTemplate()));
 
     @InjectMocks
-    private ProcessamentoDadosServico processamentoDadosServico;
+    private ProcessamentoDadosImagemServico processamentoDadosServico = new ProcessamentoDadosImagemServico(conexaoAPIRepositorio);
 
     @BeforeEach
     void setUp() {
@@ -34,24 +33,20 @@ class ProcessamentoDadosServicoTest {
 
         DadosAvaliacaoImagem dadosAvaliacaoImagem =
                 new DadosAvaliacaoImagem(
-                        "O que há na imagem?",
-                        "url/test",
+                        "Qual a cor da lampada que aparece na imagem?",
+                        "https://miro.medium.com/v2/resize:fit:720/format:webp/1*SdXRP8f2Lhin89Tht_GRIA.jpeg",
                         "imagemEmBase64",
-                        "Passaros"
+                        "A lampada é roxa, fazendo uma alusão a cor do mês de novembro."
                 );
 
-        String mockResponse = "Resultado esperado da API";
+        String mockResponse = "Não consegui avaliar.";
         String mockResponseConsolidado = "Resultado Consolidado esperado da API";
 
         try {
-            when(conexaoAPIRepositorio.postRequestApiGPT(anyString()))
-                    .thenReturn(mockResponse);
-            when(conexaoAPIRepositorio.postRequestApiClaude(anyString()))
-                    .thenReturn(mockResponse);
-            when(conexaoAPIRepositorio.postRequestApiLlama(anyString()))
-                    .thenReturn(mockResponse);
-            when(conexaoAPIRepositorio.postRequestApiCohere(anyString()))
-                    .thenReturn(mockResponseConsolidado);
+            doReturn(mockResponse).when(conexaoAPIRepositorio).postRequestApiGPT(anyString());
+            doReturn(mockResponse).when(conexaoAPIRepositorio).postRequestApiClaude(anyString());
+            // doReturn(mockResponse).when(conexaoAPIRepositorio).postRequestApiLlama(anyString());
+            // doReturn(mockResponseConsolidado).when(conexaoAPIRepositorio).postRequestApiCohere(anyString());
         } catch (Exception e) {
             fail("Exception inesperada: " + e.getMessage());
         }
