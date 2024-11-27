@@ -1,4 +1,5 @@
 package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA;
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.ResultadoAvaliacaoImagem;
 import org.mockito.*;
 import org.springframework.web.client.RestTemplate;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.DadosAvaliacaoImagem;
@@ -24,7 +25,7 @@ class ProcessamentoDadosServicoTest {
     }
 
     @Test
-    void gerarAvaliacaoQualitativaDadosImagem_deveChamarConexaoAPIRepositorio() {
+    void gerarAvaliacaoQualitativaDadosImagem_deveChamarConexaoAPIRepositorio() throws Exception {
 
         String mockStringBodyRequestGPT= "{\"model\":\"gpt-4\",\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"\"}]},{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Pergunta do Usuario: O que há na imagem?\\nResposta gerada pelo App: Passaros\"},{\"type\":\"image_url\",\"image_url\":\"url/test\"}]}],\"temperature\":1.0,\"max_tokens\":300,\"top_p\":1.0,\"frequency_penalty\":0.0,\"presence_penalty\":0.0}";
         String mockStringBodyRequestClaude= "{\"model\":\"claude-3-5-sonnet-20241022\",\"max_tokens\":300,\"system\":\"\",\"messages\":[{\"role\":\"user\",\"content\":[{\"type\":\"text\",\"text\":\"Pergunta do Usuario: O que há na imagem?\\nResposta gerada pelo App: Passaros\"},{\"type\":\"image\",\"source\":{\"type\":\"base64\",\"media_type\":\"image/jpeg\",\"data\":\"imagemEmBase64\"}}]}]}";
@@ -51,7 +52,7 @@ class ProcessamentoDadosServicoTest {
             fail("Exception inesperada: " + e.getMessage());
         }
 
-        String resultado = processamentoDadosServico
+        ResultadoAvaliacaoImagem resultado = processamentoDadosServico
                 .gerarAvaliacaoQualitativaDadosImagem(dadosAvaliacaoImagem);
 
         assertNotNull(resultado, "O resultado não deve ser nulo");

@@ -6,6 +6,8 @@ import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Repositorio.ConexaoAPIRep
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 
 @Service
 public class ProcessamentoDadosImagemServico {
@@ -21,49 +23,47 @@ public class ProcessamentoDadosImagemServico {
 
     }
 
-    public String gerarAvaliacaoQualitativaDadosImagem(DadosAvaliacaoImagem dadosAvaliacaoImagem){
+    public ResultadoAvaliacaoImagem gerarAvaliacaoQualitativaDadosImagem(DadosAvaliacaoImagem dadosAvaliacaoImagem) throws Exception {
 
-        String resultadoAvaliacaoGPT ;
-        String resultadoAvaliacaoClaude;
-        String resultadoAvaliacaoLlama;
-        String resultadoAvaliacaoConsolidado = null;
+        var resultadoAvaliacaoImagem = new ResultadoAvaliacaoImagem();
 
         try{
             String stringBodyRequestGPT = geraBodyRequestGPT(dadosAvaliacaoImagem);
-            resultadoAvaliacaoGPT=
-                    conexaoAPIRepositorio.postRequestApiGPT(stringBodyRequestGPT);
+            resultadoAvaliacaoImagem.setResultadoAvaliacaoGPT(
+                    conexaoAPIRepositorio.postRequestApiGPT(stringBodyRequestGPT));
 
             String stringBodyRequestClaude = gerarBodyRequestClaude(dadosAvaliacaoImagem);
-            resultadoAvaliacaoClaude =
-                    conexaoAPIRepositorio.postRequestApiClaude(stringBodyRequestClaude);
+            resultadoAvaliacaoImagem.setResultadoAvaliacaoClaude(
+                    conexaoAPIRepositorio.postRequestApiClaude(stringBodyRequestClaude));
 
             String stringBodyRequestLlama = gerarBodyRequestLlama(dadosAvaliacaoImagem);
-            resultadoAvaliacaoLlama =
-                    conexaoAPIRepositorio.postRequestApiLlama(stringBodyRequestLlama);
+            resultadoAvaliacaoImagem.setResultadoAvaliacaoLlama(
+                    conexaoAPIRepositorio.postRequestApiLlama(stringBodyRequestLlama));
 
-            String stringBodyRequestCohere = gerarBodyRequestCohere(
-                    resultadoAvaliacaoGPT, resultadoAvaliacaoClaude, resultadoAvaliacaoLlama);
-            resultadoAvaliacaoConsolidado =
-                    conexaoAPIRepositorio.postRequestApiCohere(stringBodyRequestCohere);
+            String stringBodyRequestCohere = gerarBodyRequestCohere(resultadoAvaliacaoImagem);
+            resultadoAvaliacaoImagem.setResultadoAvaliacaoConsolidado(
+                    conexaoAPIRepositorio.postRequestApiCohere(stringBodyRequestCohere));
         }
-        catch(Exception e){
+        catch (HttpClientErrorException e){
+            throw new HttpClientErrorException(e.getStatusCode(), "Erro a acessar APIs externas: " + e.getMessage());
+        }
+        catch(HttpServerErrorException e){
             e.printStackTrace();
         }
+        catch(Exception e){
+            throw new Exception(e);
+        }
 
-        return resultadoAvaliacaoConsolidado;
+        return resultadoAvaliacaoImagem;
     }
 
-    private String gerarBodyRequestCohere(
-            String resultadoAvaliacaoGPT,
-            String resultadoAvaliacaoClaude,
-            String resultadoAvaliacaoLlama) {
+    private String gerarBodyRequestCohere(ResultadoAvaliacaoImagem resultadoAvaliacaoImagem) throws Exception {
 
         String stringBodyRequestCohere = null;
 
         try{
             BodyRequestCohere bodyRequestCohere = new BodyRequestCohere(
-                    resultadoAvaliacaoGPT,resultadoAvaliacaoClaude,resultadoAvaliacaoLlama,
-                    Enumeradores.ModeloCohere.COHERE_CHAT_V2);
+                    resultadoAvaliacaoImagem,Enumeradores.ModeloCohere.COHERE_CHAT_V2);
 
             stringBodyRequestCohere = objectMapper.writeValueAsString(bodyRequestCohere);
         }
@@ -116,7 +116,7 @@ public class ProcessamentoDadosImagemServico {
 
         try{
             BodyRequestGPT bodyRequestGPT = new BodyRequestGPT(
-                    dadosAvaliacaoImagem, Enumeradores.ModeloGPT.GPT_4);
+                    dadosAvaliacaoImagem, Enumeradores.ModeloGPT.GPT_4_MINI);
 
             stringBodyRequestGPT = objectMapper.writeValueAsString(bodyRequestGPT);
         }

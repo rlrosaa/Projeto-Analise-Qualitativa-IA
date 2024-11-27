@@ -1,5 +1,7 @@
 package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA;
 
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Funcao.ProcessamentoDadosImagemFuncao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,37 +10,50 @@ import org.springframework.stereotype.Component;
 import java.util.Scanner;
 
 @SpringBootApplication
-public class ProjetoAnaliseQualitativaIaApplication {
+public class ProjetoAnaliseQualitativaIaApplication implements CommandLineRunner {
+
+	private final ProcessamentoDadosImagemFuncao processamentoDadosImagemFuncao;
+
+	@Autowired
+	public ProjetoAnaliseQualitativaIaApplication(
+			ProcessamentoDadosImagemFuncao processamentoDadosImagemFuncao) {
+		this.processamentoDadosImagemFuncao = processamentoDadosImagemFuncao;
+	}
 
 	public static void main(String[] args) {
 		SpringApplication.run(ProjetoAnaliseQualitativaIaApplication.class, args);
 	}
-}
 
-@Component
-class ConsoleInputHandler implements CommandLineRunner {
+	public void run(String... args) {
 
-	public void run(String... args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
-		System.out.println("Digite um comando ou texto:");
 
-		while (scanner.hasNextLine()) {
-			String input = scanner.nextLine();
-			handleInput(input);
+		try {
 
-			if ("sair".equalsIgnoreCase(input)) {
-				System.out.println("Encerrando aplicação...");
-				break;
+			System.out.println("\nAtenção: É importante que os arquivos para avaliação estejam no diretorio correto!" +
+					"\nDeseja executar a avaliação qualitativa? Y/N");
+
+			String inputUsuario = scanner.nextLine();
+
+			while (!"N".equalsIgnoreCase(inputUsuario)) {
+
+				if ("Y".equalsIgnoreCase(inputUsuario)) {
+					System.out.println("Executando aplicação...");
+					processamentoDadosImagemFuncao.gerarAnaliseQualitativa();
+					System.out.println("Execução da aplicação concluida.");
+					break;
+				} else {
+					System.out.println("Insira um valor válido: (S/N)");
+				}
+				inputUsuario = scanner.nextLine();
 			}
-
-			System.out.println("Digite outro comando ou texto:");
+		} catch (Exception e) {
+			System.out.println("Erro gerado: " + e.getMessage());
 		}
 
-		scanner.close();
+		System.out.println("Pressione tecla Enter para finalizar...");
+		scanner.nextLine();
+		System.exit(0);
 	}
 
-	private void handleInput(String input) {
-		// Aqui você pode adicionar lógica para processar a entrada
-		System.out.println("Você digitou: " + input);
-	}
 }

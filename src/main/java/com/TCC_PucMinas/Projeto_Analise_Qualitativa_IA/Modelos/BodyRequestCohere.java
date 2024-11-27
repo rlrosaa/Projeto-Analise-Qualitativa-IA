@@ -26,11 +26,10 @@ public class BodyRequestCohere {
     }
 
     public BodyRequestCohere (
-            String resultadoAvaliacao1, String resultadoAvaliacao2, String  resultadoAvaliacao3,
+            ResultadoAvaliacaoImagem resultadoAvaliacaoImagem,
             Enumeradores.@NotNull ModeloCohere modelo) {
 
-        String resultadosAvaliacaoAgrupados = geraResultadosAgrupados(
-                resultadoAvaliacao1,resultadoAvaliacao2,resultadoAvaliacao3);
+        String resultadosAvaliacaoAgrupados = geraResultadosAgrupados(resultadoAvaliacaoImagem);
 
         this.model = modelo.getNomeModelo();
 
@@ -46,11 +45,13 @@ public class BodyRequestCohere {
 
     }
 
-    private String geraResultadosAgrupados(
-            String resultadoAvaliacao1, String resultadoAvaliacao2, String resultadoAvaliacao3) {
+    private String geraResultadosAgrupados(ResultadoAvaliacaoImagem resultadoAvaliacaoImagem) {
 
         return "Avaliação 1: %s \n Avaliação 2: %s \n Avaliação 3: %s"
-                .formatted(resultadoAvaliacao1,resultadoAvaliacao2,resultadoAvaliacao3);
+                .formatted(
+                        resultadoAvaliacaoImagem.getResultadoAvaliacaoGPT(),
+                        resultadoAvaliacaoImagem.getResultadoAvaliacaoClaude(),
+                        resultadoAvaliacaoImagem.getResultadoAvaliacaoLlama());
 
     }
 

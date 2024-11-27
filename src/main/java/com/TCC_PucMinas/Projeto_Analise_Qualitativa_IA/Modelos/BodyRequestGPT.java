@@ -1,5 +1,6 @@
 package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Enumeradores.Enumeradores;
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Utils.Constantes;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Utils.PromptsIA;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -41,7 +42,11 @@ public class BodyRequestGPT {
         private String text;
 
         @JsonProperty("image_url")
-        private String imageUrl;
+        private ImageUrl imageUrl;
+    }
+    public static class ImageUrl {
+        @JsonProperty("url")
+        private String url;
     }
 
     public BodyRequestGPT(
@@ -72,6 +77,8 @@ public class BodyRequestGPT {
         this.messages[1].content[0].text = dadosAvaliacaoImagem.criaStringPerguntaEResposta();
         this.messages[1].content[1] = new Content();
         this.messages[1].content[1].type = Enumeradores.DataType.IMAGE_URL.getDataType();
-        this.messages[1].content[1].imageUrl = dadosAvaliacaoImagem.getUrlImagem();
+        this.messages[1].content[1].imageUrl = new ImageUrl();
+        this.messages[1].content[1].imageUrl.url = "data:%s;base64,%s"
+                .formatted(Constantes.MEDIA_TYPE_IMAGEM,dadosAvaliacaoImagem.getDadosImagem());
     }
 }

@@ -1,9 +1,11 @@
 package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Funcao;
 
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.ResultadoAvaliacaoImagem;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Servico.ProcessamentoDadosImagemServico;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Utils.Constantes;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Servico.ProcessamentoBaseDadosServico.gerarListaDadosAvaliacaoImagem;
@@ -19,30 +21,21 @@ public class ProcessamentoDadosImagemFuncao {
         this.processamentoDadosImagemServico = processamentoDadosImagemServico;
     }
 
-    public void gerarAnaliseQualitativa() throws AssertionError{
+    public void gerarAnaliseQualitativa() throws  Exception {
 
-        try{
+        var listaAvaliacaoQualitativaImagem = new ArrayList<ResultadoAvaliacaoImagem>();
+        ResultadoAvaliacaoImagem avaliacaoQualitativa;
 
-            var listaAvaliacaoQualitativaImagem = new ArrayList<String>();
-            String avaliacaoQualitativa;
+        var listaDadosAvaliacaoImagem =
+                gerarListaDadosAvaliacaoImagem(Constantes.DIRETORIO_BASE_DADOS);
 
-            var listaDadosAvaliacaoImagem =
-                    gerarListaDadosAvaliacaoImagem(Constantes.DIRETORIO_BASE_DADOS);
-
-            assert listaDadosAvaliacaoImagem != null;
-            for (var dados : listaDadosAvaliacaoImagem) {
-                avaliacaoQualitativa = processamentoDadosImagemServico.gerarAvaliacaoQualitativaDadosImagem(dados);
-                listaAvaliacaoQualitativaImagem.add(avaliacaoQualitativa);
-            }
-
-            gravarAvaliacoesQualitativasPlanilha(
-                    Constantes.DIRETORIO_BASE_DADOS ,listaAvaliacaoQualitativaImagem);
-
-
+        for (var dados : listaDadosAvaliacaoImagem) {
+            avaliacaoQualitativa = processamentoDadosImagemServico.gerarAvaliacaoQualitativaDadosImagem(dados);
+            listaAvaliacaoQualitativaImagem.add(avaliacaoQualitativa);
         }
-        catch (Exception e){
-            e.printStackTrace();
-        }
+
+        gravarAvaliacoesQualitativasPlanilha(
+                Constantes.DIRETORIO_BASE_DADOS ,listaAvaliacaoQualitativaImagem);
 
     }
 }

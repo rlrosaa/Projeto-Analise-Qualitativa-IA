@@ -2,6 +2,7 @@ package com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Servico;
 
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.DadosAvaliacaoImagem;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.DadosExtracaoImagem;
+import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Modelos.ResultadoAvaliacaoImagem;
 import com.TCC_PucMinas.Projeto_Analise_Qualitativa_IA.Utils.Constantes;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -17,11 +18,11 @@ import java.util.List;
 public class ProcessamentoBaseDadosServico {
 
     public static List<DadosAvaliacaoImagem> gerarListaDadosAvaliacaoImagem (
-            String diretorioBaseDados){
+            String diretorioBaseDados) throws IOException {
 
         var listaDadosAvaliacaoImagem = new ArrayList<DadosAvaliacaoImagem>();
 
-        try{
+       try{
             var listaDadosExtracaoImagem = extrairDadosPlanilha(diretorioBaseDados);
 
             listaDadosExtracaoImagem.forEach(dado -> {
@@ -36,8 +37,7 @@ public class ProcessamentoBaseDadosServico {
 
         }
         catch (IOException e){
-            e.printStackTrace();
-            return null;
+            throw new IOException(e);
         }
 
         return listaDadosAvaliacaoImagem;
@@ -45,7 +45,8 @@ public class ProcessamentoBaseDadosServico {
     }
 
     public static void gravarAvaliacoesQualitativasPlanilha(
-            String diretorioBaseDados, List<String> listaAvaliacaoQualitativaImagem){
+            String diretorioBaseDados,
+            List<ResultadoAvaliacaoImagem> listaAvaliacaoQualitativaImagem) throws Exception {
 
         String diretorioArquivo = diretorioBaseDados + File.separator + Constantes.NOME_ARQUIVO_PLANILHA;
 
@@ -54,15 +55,19 @@ public class ProcessamentoBaseDadosServico {
 
             Sheet sheet = workbook.getSheet(Constantes.NOME_ABA_PLANILHA);
 
-            int indiceLinha = 0;
-            for (String dado : listaAvaliacaoQualitativaImagem) {
+            int indiceLinha = 1;
+            for (var avaliacao : listaAvaliacaoQualitativaImagem) {
                 Row row = sheet.getRow(indiceLinha);
 
                 if (row == null) {
                     row = sheet.createRow(indiceLinha);
                 }
 
-                row.createCell(6).setCellValue(dado);
+                row.createCell(6).setCellValue(avaliacao.getResultadoAvaliacaoGPT());
+                row.createCell(7).setCellValue(avaliacao.getResultadoAvaliacaoClaude());
+                row.createCell(8).setCellValue(avaliacao.getResultadoAvaliacaoLlama());
+                row.createCell(9).setCellValue(avaliacao.getResultadoAvaliacaoConsolidado());
+
                 indiceLinha++;
             }
 
@@ -72,14 +77,14 @@ public class ProcessamentoBaseDadosServico {
             }
 
         } catch (IOException e) {
-            System.err.println("Erro ao atualizar o arquivo Excel: " + e.getMessage());
+            throw new Exception("Erro ao atualizar o arquivo Excel: " + e.getMessage());
         }
     }
 
     private static String gerarImagemBase64(String diretorioArquivo, String nomeImagem) {
         File file = new File(
         diretorioArquivo + File.separator + Constantes.DIRETORIO_IMAGENS
-                    + File.separator + nomeImagem);
+                    + File.separator + nomeImagem + Constantes.EXTENSAO_IMAGEM);
 
         try (FileInputStream imageInFile = new FileInputStream(file)) {
             byte[] imageBytes = new byte[(int) file.length()];
@@ -94,40 +99,46 @@ public class ProcessamentoBaseDadosServico {
     }
 
     private static List<DadosExtracaoImagem> extrairDadosPlanilha(String diretorioBaseDados) throws IOException {
+        try{
 
-        String diretorioArquivo = diretorioBaseDados + File.separator + Constantes.NOME_ARQUIVO_PLANILHA;
+            String diretorioArquivo = diretorioBaseDados + File.separator + Constantes.NOME_ARQUIVO_PLANILHA;
 
-        FileInputStream arquivoPlanilha = new FileInputStream(diretorioArquivo);
-        Workbook workbook = new XSSFWorkbook(arquivoPlanilha);
+            FileInputStream arquivoPlanilha = new FileInputStream(diretorioArquivo);
+            Workbook workbook = new XSSFWorkbook(arquivoPlanilha);
 
-        List<DadosExtracaoImagem> listaDadosPlanilha = new ArrayList<>();
+            List<DadosExtracaoImagem> listaDadosPlanilha = new ArrayList<>();
 
-        Sheet sheet = workbook.getSheet(Constantes.NOME_ABA_PLANILHA);
+            Sheet sheet = workbook.getSheet(Constantes.NOME_ABA_PLANILHA);
 
-        int numeroLinhas = sheet.getPhysicalNumberOfRows();
+            int numeroLinhas = sheet.getPhysicalNumberOfRows();
 
-        for (int i = 1; i < numeroLinhas; i++) {
-            Row row = sheet.getRow(i);
+            for (int i = 1; i < numeroLinhas; i++) {
+                Row row = sheet.getRow(i);
 
-            if (row != null) {
-                Cell pergunta = row.getCell(1);
-                Cell resposta = row.getCell(4);
-                Cell nomeImagem = row.getCell(5);
+                if (row != null) {
+                    Cell pergunta = row.getCell(1);
+                    Cell resposta = row.getCell(4);
+                    Cell nomeImagem = row.getCell(5);
 
-                var dadosExtracaoImagem = new DadosExtracaoImagem();
-                dadosExtracaoImagem.setPergunta(getCellValueAsString(pergunta));
-                dadosExtracaoImagem.setResposta(getCellValueAsString(resposta));
-                dadosExtracaoImagem.setNomeImagem(getCellValueAsString(nomeImagem));
+                    var dadosExtracaoImagem = new DadosExtracaoImagem();
+                    dadosExtracaoImagem.setPergunta(getCellValueAsString(pergunta));
+                    dadosExtracaoImagem.setResposta(getCellValueAsString(resposta));
+                    dadosExtracaoImagem.setNomeImagem(getCellValueAsString(nomeImagem));
 
-                listaDadosPlanilha.add(dadosExtracaoImagem);
+                    listaDadosPlanilha.add(dadosExtracaoImagem);
 
+                }
             }
+
+            workbook.close();
+            arquivoPlanilha.close();
+
+            return listaDadosPlanilha;
+
+        } catch (Exception e) {
+            throw new IOException(e);
         }
 
-        workbook.close();
-        arquivoPlanilha.close();
-
-        return listaDadosPlanilha;
     }
 
     private static String getCellValueAsString(Cell cell) {
